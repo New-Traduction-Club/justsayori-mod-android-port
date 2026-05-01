@@ -630,34 +630,8 @@ class SetupActivity : BaseActivity() {
             deleteFile(masUri!!)
         }
         
-        // Extract py_scripts_and_other_stuff.zip
+        // Finalizing
         updateStatus(getString(R.string.setup_progress_finalizing))
-        try {
-            val assetTemp = File(cacheDir, "py_scripts_temp.zip")
-            assets.open("py_scripts_and_other_stuff.zip").use { ais ->
-                FileOutputStream(assetTemp).use { fos -> ais.copyTo(fos) }
-            }
-            
-            ZipFile(assetTemp).use { zip ->
-                val entries = zip.entries()
-                while (entries.hasMoreElements()) {
-                    val entry = entries.nextElement()
-                    if (!entry.isDirectory) {
-                        val targetFile = File(gameDir, entry.name)
-                        targetFile.parentFile?.mkdirs()
-                        zip.getInputStream(entry).use { input ->
-                             FileOutputStream(targetFile).use { output ->
-                                 input.copyTo(output)
-                             }
-                        }
-                    }
-                }
-            }
-            assetTemp.delete()
-            
-        } catch (e: Exception) {
-            android.util.Log.w("Setup", "py_scripts zip missing or error: ${e.message}")
-        }
     }
 
     private fun confirmDeleteZip(requestCode: Int) {

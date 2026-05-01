@@ -54,7 +54,6 @@ class LauncherActivity : BaseActivity() {
 
     companion object {
         private const val STATE_BOOT_SEQUENCE_COMPLETED = "state_boot_sequence_completed"
-        private const val STATE_DOWNLOAD_CENTER_CHECK_COMPLETED = "state_download_center_check_completed"
         private const val REQUEST_CODE_EXPORT_SAVES = 2001
         private const val REQUEST_CODE_IMPORT_SAVES = 2002
         private const val MAX_EXPANDED_ITEMS_PER_COLUMN = 6
@@ -95,7 +94,6 @@ class LauncherActivity : BaseActivity() {
     private var currentLanguage: String = ""
     private var isUiInitialized = false
     private var bootSequenceCompleted = false
-    private var downloadCenterCheckCompleted = false
     
     private var progressDialog: AlertDialog? = null
     private var progressIndicator: android.widget.ProgressBar? = null
@@ -120,15 +118,12 @@ class LauncherActivity : BaseActivity() {
         WorkManager.getInstance(applicationContext).cancelAllWorkByTag(NotificationWorker.WORK_TAG)
         currentLanguage = prefs.getString("language", "English") ?: "English"
         bootSequenceCompleted = savedInstanceState?.getBoolean(STATE_BOOT_SEQUENCE_COMPLETED, false) ?: false
-        downloadCenterCheckCompleted = savedInstanceState?.getBoolean(STATE_DOWNLOAD_CENTER_CHECK_COMPLETED, false) ?: false
 
         val isFirstLaunch = prefs.getBoolean("is_first_launch", true)
         val setupConfirmed = prefs.getBoolean("setup_language_confirmed", false)
         
         if (isFirstLaunch && !setupConfirmed) {
             showLanguageSelectionDialog()
-        } else {
-            checkAndInstallLanguageScripts()
         }
 
         createLanguageFile(currentLanguage)
@@ -253,7 +248,6 @@ class LauncherActivity : BaseActivity() {
 
     override fun onSaveInstanceState(outState: Bundle) {
         outState.putBoolean(STATE_BOOT_SEQUENCE_COMPLETED, bootSequenceCompleted)
-        outState.putBoolean(STATE_DOWNLOAD_CENTER_CHECK_COMPLETED, downloadCenterCheckCompleted)
         super.onSaveInstanceState(outState)
     }
 
@@ -322,7 +316,6 @@ class LauncherActivity : BaseActivity() {
     private fun getExpandedItems(): List<DesktopShortcut> {
         return listOf(
             DesktopShortcut(R.string.launcher_browse_external, R.drawable.ic_launcher_external, "external_files"),
-            DesktopShortcut(R.string.launcher_download_center, R.drawable.ic_launcher_download, "download_center"),
             DesktopShortcut(R.string.launcher_add_extra_content, android.R.drawable.ic_input_add, "extra_content"),
             DesktopShortcut(R.string.launcher_discord_rpc, android.R.drawable.stat_notify_chat, "discord_rpc"),
             DesktopShortcut(R.string.launcher_backups, R.drawable.ic_launcher_backup, "backups"),
@@ -376,7 +369,6 @@ class LauncherActivity : BaseActivity() {
             startBootSequence()
         } else {
             ensureStartMenuVisible()
-            checkDownloadCenterUpdatesAfterBootIfNeeded()
         }
     }
 
@@ -478,7 +470,6 @@ class LauncherActivity : BaseActivity() {
                     lifecycleScope.launch {
                         delay(1000)
                         showStartMenuAnimated()
-                        checkDownloadCenterUpdatesAfterBootIfNeeded()
                     }
                 }
                 .start()
@@ -507,68 +498,6 @@ class LauncherActivity : BaseActivity() {
     private fun resolveInternalStorageStats(): Pair<Long, Long> {
         val statFs = StatFs(filesDir.absolutePath)
         return statFs.totalBytes to statFs.availableBytes
-    }
-
-    private fun checkDownloadCenterUpdatesAfterBootIfNeeded() {
-        if (downloadCenterCheckCompleted || !isUiInitialized) return
-        downloadCenterCheckCompleted = true
-
-        val prefs = getSharedPreferences(BaseActivity.PREFS_NAME, MODE_PRIVATE)
-        val wifiOnly = prefs.getBoolean("wifi_only", false)
-        if (!isNetworkConnected()) return
-        if (wifiOnly && !isConnectedToWifi()) return
-
-        lifecycleScope.launch {
-            val updateManager = UpdateManager(this@LauncherActivity)
-            val updates = updateManager.fetchUpdates(getString(R.string.manifest_url))
-            val availableCount = updates.count { updateManager.isUpdateAvailable(it) }
-            if (availableCount > 0 && !isFinishing && !isDestroyed) {
-                showDownloadCenterUpdatePrompt(availableCount)
-            }
-        }
-    }
-
-    private fun showDownloadCenterUpdatePrompt(availableCount: Int) {
-        val message = if (availableCount == 1) {
-            getString(R.string.download_center_update_prompt_message_single)
-        } else {
-            getString(R.string.download_center_update_prompt_message_multiple, availableCount)
-        }
-
-        GameDialogBuilder(this)
-            .setTitle(getString(R.string.download_center_update_prompt_title))
-            .setMessage(message)
-            .setPositiveButton(getString(R.string.launcher_download_center)) { _, _ ->
-                returnFromWindow = true
-                startActivity(Intent(this, DownloadCenterActivity::class.java))
-            }
-            .setNegativeButton(getString(R.string.import_conflict_ignore), null)
-            .show()
-    }
-
-    @Suppress("DEPRECATION")
-    private fun isNetworkConnected(): Boolean {
-        val connectivityManager = getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            val network = connectivityManager.activeNetwork ?: return false
-            val capabilities = connectivityManager.getNetworkCapabilities(network) ?: return false
-            capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
-        } else {
-            connectivityManager.activeNetworkInfo?.isConnected == true
-        }
-    }
-
-    @Suppress("DEPRECATION")
-    private fun isConnectedToWifi(): Boolean {
-        val connectivityManager = getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            val network = connectivityManager.activeNetwork ?: return false
-            val capabilities = connectivityManager.getNetworkCapabilities(network) ?: return false
-            capabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI)
-        } else {
-            val activeNetwork = connectivityManager.activeNetworkInfo
-            activeNetwork?.isConnected == true && activeNetwork.type == ConnectivityManager.TYPE_WIFI
-        }
     }
 
     private fun setBootConsoleText(text: String) {
@@ -715,21 +644,7 @@ class LauncherActivity : BaseActivity() {
         
         when (shortcut.actionId) {
             "start_game" -> {
-                showProgressDialog(getString(R.string.installing_language_data, currentLanguage))
-                Thread {
-                    try {
-                        installLogic(currentLanguage)
-                        runOnUiThread {
-                            dismissProgressDialog()
-                            viewModel.handlePlayClick()
-                        }
-                    } catch (e: Exception) {
-                        runOnUiThread {
-                            dismissProgressDialog()
-                            InAppNotifier.show(this@LauncherActivity, getString(R.string.install_error, e.message), true)
-                        }
-                    }
-                }.start()
+                viewModel.handlePlayClick()
             }
             "import" -> {
                 GameDialogBuilder(this)
@@ -769,10 +684,6 @@ class LauncherActivity : BaseActivity() {
             "settings" -> {
                 returnFromWindow = true
                 startActivity(Intent(this, SettingsActivity::class.java))
-            }
-            "download_center" -> {
-                returnFromWindow = true
-                startActivity(Intent(this, DownloadCenterActivity::class.java))
             }
             "extra_content" -> {
                 returnFromWindow = true
@@ -845,24 +756,6 @@ class LauncherActivity : BaseActivity() {
                 is LauncherViewModel.LaunchState.Idle -> {
                     dismissProgressDialog()
                 }
-                is LauncherViewModel.LaunchState.CheckingNetwork -> {
-                    showProgressDialog(getString(R.string.translation_checking))
-                }
-                is LauncherViewModel.LaunchState.CheckingUpdates -> {
-                    updateProgressText(getString(R.string.translation_checking))
-                }
-                is LauncherViewModel.LaunchState.UpdateAvailable -> {
-                    dismissProgressDialog()
-                    showUpdateConfirmationDialog(state.isMobileData)
-                }
-                is LauncherViewModel.LaunchState.Downloading -> {
-                    if (progressDialog == null || !progressDialog!!.isShowing) {
-                        showProgressDialog(getString(R.string.translation_updating))
-                    }
-                    progressIndicator?.isIndeterminate = false
-                    progressIndicator?.progress = state.progress
-                    updateProgressText("${getString(R.string.translation_updating)} ${state.progress}%")
-                }
                 is LauncherViewModel.LaunchState.LaunchGame -> {
                     dismissProgressDialog()
                     viewModel.consumeLaunchState()
@@ -900,55 +793,11 @@ class LauncherActivity : BaseActivity() {
         }
     }
     
-    private fun showProgressDialog(message: String) {
-        if (progressDialog?.isShowing == true) {
-            updateProgressText(message)
-            return
-        }
-        
-        val builder = GameDialogBuilder(this)
-        val view = LayoutInflater.from(this).inflate(R.layout.dialog_progress, null) // Assuming we create this layout
-        progressIndicator = view.findViewById(R.id.progressBar)
-        progressText = view.findViewById(R.id.progressText)
-        progressText?.text = message
-        progressIndicator?.isIndeterminate = true
-        
-        builder.setView(view)
-        builder.setCancelable(false)
-        progressDialog = builder.create()
-        progressDialog?.show()
-    }
-    
-    private fun updateProgressText(message: String) {
-        progressText?.text = message
-    }
-    
     private fun dismissProgressDialog() {
         progressDialog?.dismiss()
         progressDialog = null
         progressIndicator = null
         progressText = null
-    }
-
-    private fun showUpdateConfirmationDialog(isMobile: Boolean) {
-        val title = getString(R.string.dialog_update_available_title)
-        val msg = if (isMobile) {
-            getString(R.string.dialog_update_available_mobile_message)
-        } else {
-            getString(R.string.dialog_update_available_wifi_message)
-        }
-        
-        GameDialogBuilder(this)
-            .setTitle(title)
-            .setMessage(msg)
-            .setPositiveButton(getString(R.string.action_update)) { _, _ ->
-                viewModel.confirmUpdate(useMobileData = true)
-            }
-            .setNegativeButton(getString(R.string.action_skip)) { _, _ ->
-                viewModel.skipUpdate()
-            }
-            .setCancelable(false)
-            .show()
     }
 
     private fun showLanguageSelectionDialog() {
@@ -997,75 +846,6 @@ class LauncherActivity : BaseActivity() {
                     runOnUiThread { InAppNotifier.show(this, "Import preparation failed") }
                 }
             }.start()
-        }
-    }
-
-    private fun checkAndInstallLanguageScripts() {
-        val prefs = getSharedPreferences("app_prefs", MODE_PRIVATE)
-        val selectedLang = prefs.getString("language", "English") ?: "English"
-        val installedLang = prefs.getString("installed_language", null)
-        val gameDir = File(filesDir, "game")
-
-        if (selectedLang != installedLang || !gameDir.exists()) {
-            showProgressDialog(getString(R.string.installing_language_data, selectedLang))
-            
-            Thread {
-                try {
-                    installLogic(selectedLang)
-                    
-                    prefs.edit().putString("installed_language", selectedLang).apply()
-                    
-                    runOnUiThread {
-                        dismissProgressDialog()
-                        createLanguageFile(selectedLang)
-                    }
-                } catch (e: Exception) {
-                    runOnUiThread {
-                        dismissProgressDialog()
-                        InAppNotifier.show(this, getString(R.string.install_error, e.message), true)
-                    }
-                }
-            }.start()
-        }
-    }
-
-    private fun installLogic(language: String) {
-        val zipName = when(language) {
-            "Español" -> "es.zip"
-            "Português" -> "pt.zip"
-            else -> "en.zip"
-        }
-        val gameDir = File(filesDir, "game")
-        
-        if (gameDir.exists()) {
-            gameDir.listFiles()?.forEach { 
-                if (it.extension == "rpyc") it.delete() 
-            }
-        } else {
-            gameDir.mkdirs()
-        }
-
-        val updateFile = File(filesDir, "LauncherUpdates/$zipName")
-        val inputStream = if (updateFile.exists()) {
-            FileInputStream(updateFile)
-        } else {
-            assets.open(zipName)
-        }
-
-        inputStream.use { stream ->
-            ZipInputStream(stream).use { zip ->
-                var entry = zip.nextEntry
-                while (entry != null) {
-                    val file = File(gameDir, entry.name)
-                    if (entry.isDirectory) {
-                        file.mkdirs()
-                    } else {
-                        file.parentFile?.mkdirs()
-                        FileOutputStream(file).use { out -> zip.copyTo(out) }
-                    }
-                    entry = zip.nextEntry
-                }
-            }
         }
     }
 

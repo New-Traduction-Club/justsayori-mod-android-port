@@ -10,8 +10,7 @@
     <androidx.cardview.widget.CardView
         android:id="@+id/startMenuPanel"
         android:layout_width="240dp"
-        android:layout_height="0dp"
-        app:layout_constraintHeight_default="wrap"
+        android:layout_height="wrap_content"
         app:layout_constraintHeight_max="@dimen/start_menu_collapsed_height"
         app:layout_constrainedHeight="true"
         android:layout_marginStart="32dp"

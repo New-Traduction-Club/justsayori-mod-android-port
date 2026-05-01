@@ -1,5 +1,6 @@
 <resources>
     <string name="app_name">JSL - An Unofficial After Story launcher</string>
+    <string name="attribution_default">Default Attribution</string>
 
     <string-array name="languages">
         <item>English</item>
@@ -170,7 +171,6 @@
     <string name="launcher_internal_desc">Manage game files</string>
     <string name="launcher_external_desc">Access save files</string>
     <string name="launcher_settings_desc">Launcher config</string>
-    <string name="launcher_download_desc">Get updates</string>
     <string name="launcher_backups_desc">Manage data backups</string>
     <string name="discord_rpc_dialog_title">Discord RPC</string>
     <string name="discord_rpc_dialog_message">Sign in with Discord first, then enable Rich Presence for in-game activity.</string>
@@ -251,19 +251,9 @@
     <string name="paste_error">Error pasting files</string>
 
     <string name="status_checking_network">Checking network...</string>
-    <string name="status_checking_updates">Checking for updates...</string>
     <string name="status_launching_game">Launching game...</string>
     <string name="status_export_ready">Export ready</string>
     <string name="status_import_completed">Import completed successfully</string>
-    <string name="error_check_updates">Failed to check updates</string>
-    <string name="error_update_failed">Update failed</string>
-    <string name="error_update_failed_launching_outdated">Update failed. Launching outdated version.</string>
-
-    <string name="dialog_update_available_title">Update Available</string>
-    <string name="dialog_update_available_wifi_message">An update is available. Download now?</string>
-    <string name="dialog_update_available_mobile_message">An update is available. You are on mobile data. Do you want to download it now?</string>
-    <string name="action_skip">Skip</string>
-    <string name="action_update">Update</string>
 
     <string name="settings_category_general">General</string>
     <string name="settings_category_appearance">Appearance</string>
@@ -294,7 +284,6 @@
     <string name="extracting">Extracting…</string>
     <string name="extraction_completed">Extraction completed</string>
     <string name="extraction_error">Extraction error: %1$s</string>
-    <string name="launcher_download_center">Download Center</string>
     <string name="extra_content_title">Extra Content</string>
     <string name="extra_content_prompt">What would you like to install?</string>
     <string name="extra_content_option_install_sprites">Install Sprites</string>
@@ -329,26 +318,6 @@
     <string name="submod_install_success_toast">Submod installed successfully.</string>
     <string name="submod_unexpected_error">Installation failed: %1$s</string>
     
-    <!-- Download Center Strings -->
-    <string name="manifest_url">https://raw.githubusercontent.com/New-Traduction-Club/MonikaAfterStory-Android-updates/refs/heads/main/launcher_updates.json</string>
-    <string name="download_center_title">Download Center</string>
-    <string name="no_updates_found">No updates found or connection error</string>
-    <string name="download_in_progress">Another download is in progress</string>
-    <string name="update_installed">%1$s installed successfully</string>
-    <string name="installation_failed">Installation failed: %1$s</string>
-    <string name="update_current_version">Current: %1$s -> New: %2$s (%3$s)</string>
-    <string name="btn_update">Update</string>
-    <string name="btn_reinstall">Re-install</string>
-    <string name="status_downloading">Downloading...</string>
-    <string name="status_installing">Installing...</string>
-    <string name="download_failed_error">Download failed: %1$s</string>
-    <string name="wifi_only_label">Download only on Wi-Fi</string>
-    <string name="download_center_update_prompt_title">Updates available</string>
-    <string name="download_center_update_prompt_message_single">There is 1 package update available in Download Center.</string>
-    <string name="download_center_update_prompt_message_multiple">There are %1$d package updates available in Download Center.</string>
-    <string name="data_warning_title">Mobile Data Usage</string>
-    <string name="data_warning_message">You are using mobile data. This download (%1$s) may incur additional charges. Do you want to proceed?</string>
-    <string name="calculating_size">Calculating size...</string>
 
     <!-- Piano Strings -->
     <string name="piano_settings">Settings</string>
