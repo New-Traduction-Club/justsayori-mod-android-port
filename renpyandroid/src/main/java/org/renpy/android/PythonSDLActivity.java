@@ -421,6 +421,12 @@ public class PythonSDLActivity extends SDLActivity {
         Log.v("python", "onStop() start.");
 
         super.onStop();
+
+        if (mIsInPictureInPictureMode) {
+            Log.v("python", "onStop() skipping wait, in PiP mode");
+            return;
+        }
+
         if (mPendingPictureInPictureEnter) {
             boolean inPictureInPicture = Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && isInPictureInPictureMode();
             if (!inPictureInPicture) {
@@ -586,6 +592,7 @@ public class PythonSDLActivity extends SDLActivity {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             try {
                 mPendingPictureInPictureEnter = true;
+                mIsInPictureInPictureMode = true;
                 PictureInPictureParams.Builder builder = new PictureInPictureParams.Builder();
                 
                 Rational aspectRatio = new Rational(16, 9);
@@ -608,6 +615,7 @@ public class PythonSDLActivity extends SDLActivity {
                 enterPictureInPictureMode(builder.build());
             } catch (Exception e) {
                 mPendingPictureInPictureEnter = false;
+                mIsInPictureInPictureMode = false;
                 Log.e("PythonSDLActivity", "Enter PiP failed", e);
             }
         }
@@ -615,11 +623,23 @@ public class PythonSDLActivity extends SDLActivity {
 
     @Override
     public void onPictureInPictureModeChanged(boolean isInPictureInPictureMode, Configuration newConfig) {
+        Log.v("PythonSDLActivity", "onPictureInPictureModeChanged: " + isInPictureInPictureMode);
+
+        mIsInPictureInPictureMode = isInPictureInPictureMode;
+
         super.onPictureInPictureModeChanged(isInPictureInPictureMode, newConfig);
         mPendingPictureInPictureEnter = false;
         if (isInPictureInPictureMode) {
             DiscordRpcManager.startIfEnabled(this);
         }
+
+        handleNativeState();
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        Log.v("PythonSDLActivity", "onConfigurationChanged");
+        super.onConfigurationChanged(newConfig);
     }
 
     @Override
@@ -641,6 +661,12 @@ public class PythonSDLActivity extends SDLActivity {
 
     @Override
     protected void onPause() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            if (isInPictureInPictureMode() || mPendingPictureInPictureEnter) {
+                mIsInPictureInPictureMode = true;
+            }
+        }
+
         super.onPause();
         boolean inPictureInPicture =
             Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && isInPictureInPictureMode();
