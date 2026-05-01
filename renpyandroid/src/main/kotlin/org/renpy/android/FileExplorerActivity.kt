@@ -875,7 +875,11 @@ class FileExplorerActivity : GameWindowActivity() {
                     file.name.lowercase()
                 }
                 textSize = 14f
-                setTextColor(if (isLast) 0xFFB45D85.toInt() else 0xCC7295B4.toInt())
+                setTextColor(if (isLast) {
+                    ContextCompat.getColor(this@FileExplorerActivity, R.color.colorPrimary)
+                } else {
+                    ContextCompat.getColor(this@FileExplorerActivity, R.color.colorTextSecondary)
+                })
                 setPadding(dpToPx(8), dpToPx(4), dpToPx(8), dpToPx(4))
                 if (!isLast) {
                     setOnClickListener {
@@ -890,7 +894,7 @@ class FileExplorerActivity : GameWindowActivity() {
                 val separator = TextView(this).apply {
                     text = ">"
                     textSize = 12f
-                    setTextColor(0x88B45D85.toInt())
+                    setTextColor(ContextCompat.getColor(this@FileExplorerActivity, R.color.colorDivider))
                 }
                 container.addView(separator)
             }
