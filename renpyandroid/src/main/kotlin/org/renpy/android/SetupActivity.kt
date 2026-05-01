@@ -72,6 +72,7 @@ class SetupActivity : BaseActivity() {
     private lateinit var btnLanguage: LinearLayout
     private lateinit var tvCurrentLanguage: TextView
 
+    // TODO: change download logic to JS
     private val CHECKSUM_DDLC = "2a3dd7969a06729a32ace0a6ece5f2327e29bdf460b8b39e6a8b0875e545632e"
     private val CHECKSUM_MAS = "1575791c114dcd2ed6a8868fe0f99abfa140d5d95045802a8de231026772c960"
     private val MAS_DOWNLOAD_URL = "https://github.com/Monika-After-Story/MonikaModDev/releases/download/v0.12.18/Monika_After_Story-0.12.18-Mod-Dlx.zip"

@@ -54,7 +54,7 @@ class NotificationWorker(context: Context, params: WorkerParameters) : Worker(co
     companion object {
         private const val CHANNEL_ID = "mas_game_channel_high"
         private const val CHANNEL_NAME = "MAS Notifications"
-        private const val CHANNEL_DESC = "Notifications from Monika"
+        private const val CHANNEL_DESC = "Notifications from Sayori"
         
         const val KEY_TITLE = "title"
         const val KEY_MESSAGE = "message"
@@ -197,8 +197,8 @@ class NotificationWorker(context: Context, params: WorkerParameters) : Worker(co
     }
 
     override fun doWork(): Result {
-        val title = inputData.getString(KEY_TITLE) ?: "Monika After Story"
-        val message = inputData.getString(KEY_MESSAGE) ?: "Monika is waiting..."
+        val title = inputData.getString(KEY_TITLE) ?: "Just Sayori"
+        val message = inputData.getString(KEY_MESSAGE) ?: "Sayori is waiting..."
         val imagePath = inputData.getString(KEY_IMAGE_PATH)
 
         triggerNotification(applicationContext, title, message, imagePath)

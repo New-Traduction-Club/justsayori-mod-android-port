@@ -10,7 +10,7 @@ class AppInfoActivity : GameWindowActivity() {
 
     private lateinit var binding: ActivityAppInfoBinding
 
-    private val COMMIT_HASH = "a07be5c"
+    private val COMMIT_HASH = "98b8fe1"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -47,7 +47,7 @@ class AppInfoActivity : GameWindowActivity() {
         binding.tvCommit.text = getString(R.string.app_info_commit, COMMIT_HASH)
 
         binding.cvCommit.setOnClickListener {
-            val url = "https://github.com/New-Traduction-Club/MonikaAfterStory-Android-port"
+            val url = "https://github.com/New-Traduction-Club/justsayori-mod-android-port"
             val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
             startActivity(intent)
         }
