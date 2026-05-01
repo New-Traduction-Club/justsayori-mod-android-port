@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">JSL - An Unofficial After Story launcher</string>
+    <string name="app_name">JSL - An After Story launcher</string>
 
     <!-- Setup Screen Strings -->
-    <string name="setup_title">Bienvenido a JSL - An Unofficial After Story launcher</string>
+    <string name="setup_title">Bienvenido a JSL - An After Story launcher</string>
     <string name="setup_description">Para usar este launcher, necesitas proporcionar los archivos originales de Doki Doki Literature Club y los archivos del mod Just Sayori. Respetamos las IP Guidelines y no podemos distribuir estos archivos.</string>
     <string name="setup_step_1_title">Paso 1: Doki Doki Literature Club</string>
     <string name="setup_step_1_desc">Descarga la versión oficial de DDLC para Windows.</string>
