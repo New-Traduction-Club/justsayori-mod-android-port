@@ -9,19 +9,22 @@
     <string name="setup_step_1_desc">Descarga la versión oficial de DDLC para Windows.</string>
     <string name="setup_step_1_url">https://ddlc.moe/</string>
     <string name="setup_ddlc_sha256">SHA256: 2a3dd7969a06729a32ace0a6ece5f2327e29bdf460b8b39e6a8b0875e545632e</string>
-    <string name="setup_step_2_title">Paso 2: JSL</string>
-    <string name="setup_step_2_desc">Descarga la versión 0.12.18 Dlx de MAS.</string>
-    <string name="setup_step_2_url">https://github.com/Monika-After-Story/MonikaModDev/releases/tag/v0.12.18</string>
-    <string name="setup_mas_filename">Objetivo: Monika_After_Story-0.12.18-Mod-Dlx.zip</string>
-    <string name="setup_mas_sha256">SHA256: 1575791c114dcd2ed6a8868fe0f99abfa140d5d95045802a8de231026772c960</string>
+    <string name="setup_step_2_title">Paso 2: Just Sayori Mod</string>
+    <string name="setup_step_2_desc">Descarga la última versión del Mod Just Sayori.</string>
+    <string name="setup_step_2_url">https://github.com/New-Traduction-Club/justsayori-mod/releases</string>
+    <string name="setup_mod_sha256">SHA256: %1$s</string>
     <string name="setup_btn_download">Descargar</string>
     <string name="setup_btn_download_manual">Descargar manualmente</string>
     <string name="setup_btn_download_auto">Descargar automáticamente</string>
     <string name="setup_btn_select_file">Seleccionar Archivo</string>
     <string name="setup_confirm_delete_zip_title">¿Eliminar ZIP?</string>
     <string name="setup_confirm_delete_zip_message">¿Quieres eliminar el archivo ZIP después de la instalación para ahorrar espacio?</string>
-    <string name="setup_downloading_mas">Descargando MAS...</string>
+    <string name="setup_downloading_mod">Descargando mod...</string>
     <string name="setup_download_error">Error de descarga: %1$s</string>
+    <string name="setup_select_version_title">Seleccionar Versión</string>
+    <string name="setup_error_incompatible_version">Esta versión requiere una versión más reciente de la app (v%1$d). Por favor actualiza el launcher.</string>
+    <string name="setup_fetching_packages">Obteniendo versiones disponibles...</string>
+    <string name="setup_error_fetching_packages">No se pudieron obtener las versiones disponibles.</string>
     <string name="yes">Sí</string>
     <string name="no">No</string>
     <string name="action_ok">Vale</string>
@@ -264,7 +267,7 @@
     <!-- Notification Strings -->
     <string name="notification_channel_name">Descargas</string>
     <string name="notification_channel_description">Notificaciones para descargas de archivos</string>
-    <string name="notification_download_title">Descargando MAS</string>
+    <string name="notification_download_title">Descargando mod</string>
     <string name="notification_download_complete">Descarga Completada</string>
     <string name="notification_download_failed">Descarga Fallida</string>
     <string name="notification_download_progress">Velocidad: %1$s/s • Estimado: %2$s</string>
