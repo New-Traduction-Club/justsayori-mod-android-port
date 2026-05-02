@@ -40,6 +40,12 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.lifecycle.lifecycleScope
 import android.app.ActivityManager
+import android.animation.ValueAnimator
+import android.view.animation.LinearInterpolator
+import android.graphics.Bitmap
+import android.graphics.Color
+import android.graphics.Shader
+import android.graphics.drawable.BitmapDrawable
 
 
 import kotlinx.coroutines.delay
@@ -140,6 +146,8 @@ class LauncherActivity : BaseActivity() {
         initializeDesktopGrid()
         startSystemClockWorker()
         setupDynamicShortcuts(prefs.getBoolean("is_setup_completed", false))
+        
+        startBootCrtAnimations()
         
         createNotificationChannel()
 
@@ -435,7 +443,7 @@ class LauncherActivity : BaseActivity() {
                 delay(hexLineIntervalMs)
             }
 
-            appendBootText("\nTraduction Club BIOS v0.2\n")
+            appendBootText("\nTraduction Club BIOS v0.3\n")
             appendBootText("Kernel: $kernelVersion\n")
             appendBootText("Board: $manufacturer $model\n")
             appendBootText("OS: Android $androidVersion\n")
@@ -714,6 +722,42 @@ class LauncherActivity : BaseActivity() {
                 startActivity(Intent(this, AppInfoActivity::class.java))
             }
         }
+    }
+
+    private fun startBootCrtAnimations() {
+        val scanlineBitmap = Bitmap.createBitmap(1, 2, Bitmap.Config.ARGB_8888)
+        scanlineBitmap.setPixel(0, 0, Color.TRANSPARENT)
+        scanlineBitmap.setPixel(0, 1, Color.argb(45, 0, 0, 0))
+        
+        val scanlineDrawable = BitmapDrawable(resources, scanlineBitmap)
+        scanlineDrawable.tileModeY = Shader.TileMode.REPEAT
+        
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            binding.crtOverlay.foreground = scanlineDrawable
+        } else {}
+
+        val rollingLine = binding.bootRollingLine
+        rollingLine.post {
+            val parentHeight = binding.bootScreenLayout.height.toFloat()
+            val lineAnimator = ValueAnimator.ofFloat(-200f, parentHeight + 200f)
+            lineAnimator.duration = 4000
+            lineAnimator.repeatCount = ValueAnimator.INFINITE
+            lineAnimator.interpolator = LinearInterpolator()
+            lineAnimator.addUpdateListener { animator ->
+                rollingLine.translationY = animator.animatedValue as Float
+            }
+            lineAnimator.start()
+        }
+
+        val overlay = binding.crtOverlay
+        val flickerAnimator = ValueAnimator.ofFloat(0.6f, 0.8f)
+        flickerAnimator.duration = 60
+        flickerAnimator.repeatCount = ValueAnimator.INFINITE
+        flickerAnimator.repeatMode = ValueAnimator.REVERSE
+        flickerAnimator.addUpdateListener { animator ->
+            overlay.alpha = animator.animatedValue as Float
+        }
+        flickerAnimator.start()
     }
 
     private fun startSystemClockWorker() {
