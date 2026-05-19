@@ -4,6 +4,7 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.Service
 import android.content.Intent
+import android.content.pm.ServiceInfo
 import android.os.Build
 import android.os.IBinder
 import androidx.core.app.NotificationCompat
@@ -71,19 +72,23 @@ class DownloadService : Service() {
             .setContentTitle(getString(R.string.notification_download_title))
             .setContentText(getString(R.string.setup_downloading_mod))
             .setSmallIcon(android.R.drawable.stat_sys_download)
-            .setPriority(NotificationCompat.PRIORITY_LOW)
+             .setPriority(NotificationCompat.PRIORITY_HIGH)
             .setOngoing(true)
-            .setProgress(100, 0, true)
+             .setProgress(100, 0, false)
             .build()
 
-        startForeground(NOTIFICATION_ID, notification)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+            startForeground(NOTIFICATION_ID, notification, ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC)
+        } else {
+            startForeground(NOTIFICATION_ID, notification)
+        }
     }
 
     private fun createNotificationChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val name = getString(R.string.notification_channel_name)
             val descriptionText = getString(R.string.notification_channel_description)
-            val importance = NotificationManager.IMPORTANCE_LOW
+                val importance = NotificationManager.IMPORTANCE_HIGH
             val channel = NotificationChannel(NOTIFICATION_CHANNEL_ID, name, importance).apply {
                 description = descriptionText
             }
@@ -97,7 +102,7 @@ class DownloadService : Service() {
             .setContentTitle(getString(R.string.notification_download_title))
             .setContentText(getString(R.string.notification_download_progress, speed, eta))
             .setSmallIcon(android.R.drawable.stat_sys_download)
-            .setPriority(NotificationCompat.PRIORITY_LOW)
+             .setPriority(NotificationCompat.PRIORITY_HIGH)
             .setOngoing(true)
             .setProgress(100, progress, false)
             .setOnlyAlertOnce(true)
@@ -111,6 +116,7 @@ class DownloadService : Service() {
         isDownloading = true
         CoroutineScope(Dispatchers.IO).launch {
             try {
+                updateNotification(0, "...", "...")
                 val url = java.net.URL(urlString)
                 val connection = url.openConnection() as java.net.HttpURLConnection
                 connection.connect()
@@ -129,9 +135,6 @@ class DownloadService : Service() {
                 var total: Long = 0
                 var lastUpdate = 0L
                 val startTime = System.currentTimeMillis()
-
-                // Initial notification
-                updateNotification(0, "...", "...")
 
                 while (input.read(data).also { count = it } != -1) {
                     total += count
