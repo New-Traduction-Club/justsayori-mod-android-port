@@ -17,12 +17,12 @@
 ## Key Features
 
 - **One-Click Installation:** Automatic download and setup of the JS mod.
-<!-- - **Content Installers:** Built-in managers for **Spritepacks** and **Submods**. -->
 - **Discord Rich Presence:** Using integrated [KizzyRPC](https://github.com/KizzyRPC). (Still working on that lol)
 - **File Explorer:** Integrated file manager to handle game files, submods, etc.
 - **Multi-Language Support:** Fully localized in English, and Español
-<!-- - **Optimized Engine:** Custom Kotlin-based `unrpa` implementation and stockfish 8 library. -->
 - **Cool UI:** A launcher based in another cool UI...
+<!-- - **Content Installers:** Built-in managers for **Spritepacks** and **Submods**. -->
+<!-- - **Optimized Engine:** Custom Kotlin-based `unrpa` implementation and stockfish 8 library. -->
 
 ## Installation
 
@@ -57,9 +57,9 @@ To handle Ren'Py Archive (`.rpa`) extraction natively, we developed a custom `un
 ## Credits
 
 *   **[Team Salvato](https://teamsalvato.com/):** For creating the incredible *Doki Doki Literature Club!*
-<!-- *   **[Monika After Story Team](https://www.monikaafterstory.com/):** For the original mod and their continuous hard work. -->
 *   **[Ren'Py](https://www.renpy.org/):** For the visual novel engine.
 *   **[KizzyRPC](https://github.com/KizzyRPC):** For the Android Discord RPC implementation.
+<!-- *   **[Monika After Story Team](https://www.monikaafterstory.com/):** For the original mod and their continuous hard work. -->
 
 ---
 *Developed and maintained by Traduction Club!*
