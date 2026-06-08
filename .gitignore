@@ -43,3 +43,4 @@ __pycache__/
 
 app/src/main/assets/
 gradle/
+app/release
